@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.kfjed.workshopmongodb.domain.Post;
 import com.kfjed.workshopmongodb.domain.User;
 import com.kfjed.workshopmongodb.dto.UserDTO;
 import com.kfjed.workshopmongodb.services.UserService;
@@ -35,16 +36,16 @@ public class UserResource {
 	// Poder ser usado @GetMapping
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity<UserDTO> findById(@PathVariable String id) {
-		User obj = service.findById(id);
-		return ResponseEntity.ok().body(new UserDTO(obj));
+		User user = service.findById(id);
+		return ResponseEntity.ok().body(new UserDTO(user));
 	}
 	
 	// Poder ser usado @PostMapping
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Void> insert(@RequestBody UserDTO objDto) {
-		User obj = service.fromDTO(objDto);
-		obj = service.insert(obj);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
+	public ResponseEntity<Void> insert(@RequestBody UserDTO userDto) {
+		User user = service.fromDTO(userDto);
+		user = service.insert(user);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
 		return ResponseEntity.created(uri).build();
 	}
 	
@@ -57,10 +58,17 @@ public class UserResource {
 	
 	// Poder ser usado @PostMapping
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Void> update(@RequestBody UserDTO objDto, @PathVariable String id) {
-		User obj = service.fromDTO(objDto);
-		obj.setId(id);
-		obj = service.update(obj);
+	public ResponseEntity<Void> update(@RequestBody UserDTO userDto, @PathVariable String id) {
+		User user = service.fromDTO(userDto);
+		user.setId(id);
+		user = service.update(user);
 		return ResponseEntity.noContent().build();
+	}
+	
+	// Poder ser usado @GetMapping
+	@RequestMapping(value = "/{id}/posts", method = RequestMethod.GET)
+	public ResponseEntity<List<Post>> findPosts(@PathVariable String id) {
+		User user = service.findById(id);
+		return ResponseEntity.ok().body(user.getPosts());
 	}
 }
